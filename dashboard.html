@@ -38,7 +38,12 @@ import {
 
 if(!window.FB_CONFIG){ alert('No se cargó config.js'); throw new Error('config faltante'); }
 
-const app = initializeApp(firebaseConfig);
+if (!window.FB_CONFIG) {
+  alert("No se cargó config.js");
+  throw new Error("config faltante");
+}
+const app = initializeApp(window.FB_CONFIG);
+
 
 const auth = getAuth(app);
 const db   = getFirestore(app);
