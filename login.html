@@ -1,0 +1,38 @@
+
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | Login</title>
+<link rel="stylesheet" href="/assets/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="/scripts/config.js"></script>
+</head><body>
+<div class="container" style="max-width:460px">
+  <h1>EntraDanc3 · Admin</h1>
+  <p class="sub">Ingresá con tu usuario de Firebase (Email/Password)</p>
+  <div class="card" style="padding:18px">
+    <label>Email</label><input id="email" type="email" placeholder="tu@email.com">
+    <label>Password</label><input id="pass" type="password" placeholder="••••••••">
+    <button class="btn" id="loginBtn" style="margin-top:12px;width:100%">Ingresar</button>
+    <div id="msg" class="sub" style="margin-top:10px"></div>
+  </div>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+const app = initializeApp(window.FB_CONFIG);
+const auth = getAuth(app);
+document.getElementById('loginBtn').onclick = async () => {
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('pass').value.trim();
+  const msg = document.getElementById('msg');
+  msg.textContent = 'Ingresando...';
+  try{
+    const res = await signInWithEmailAndPassword(auth, email, pass);
+    location.href = '/admin/dashboard.html';
+  }catch(e){
+    msg.textContent = 'Error: ' + (e.message||e);
+  }
+};
+onAuthStateChanged(auth, (u)=>{ if(u && u.uid===window.ADMIN_UID){ location.href='/admin/dashboard.html'; } });
+</script>
+</body></html>

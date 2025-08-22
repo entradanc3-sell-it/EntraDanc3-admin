@@ -1,0 +1,176 @@
+
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | Panel</title>
+<link rel="stylesheet" href="/assets/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="/scripts/config.js"></script>
+</head><body>
+<div class="container">
+  <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+    <h1>Panel de control</h1>
+    <div><span id="who" class="badge">Cargando...</span> <a id="logout" class="btn-ghost" href="#">Salir</a></div>
+  </div>
+  <div class="alert">Sólo el UID <code id="uid"></code> puede modificar datos. Lectura pública.</div>
+  <h2>Nuevo/Editar evento</h2>
+  <div class="card" style="padding:18px">
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <label>Slug (único, url)</label><input id="slug" placeholder="space-92-crobar-2025-08-22">
+        <label>Título</label><input id="title" placeholder="Space 92 – Crobar Phuture">
+        <label>Fecha</label><input id="date" type="date">
+        <label>Ciudad</label><input id="city" placeholder="Buenos Aires">
+        <label>Lugar</label><input id="venue" placeholder="Crobar Phuture">
+        <label>Categoría</label>
+        <select id="category">
+          <option value="fiestas">fiestas</option>
+          <option value="recitales">recitales</option>
+          <option value="futbol">futbol</option>
+        </select>
+        <label>Thumbnail (URL de imagen)</label><input id="thumb" placeholder="https://...">
+      </div>
+      <div>
+        <label>Descripción</label><textarea id="desc" rows="8" placeholder="Texto del evento..."></textarea>
+        <div class="alert"><strong>Sectores</strong> (nombre, precio, link MP)</div>
+        <div id="sectors"></div>
+        <button id="addSector" class="btn-ghost" style="margin-top:10px">+ Agregar sector</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button id="save" class="btn">Guardar</button>
+      <button id="del" class="btn-ghost">Eliminar</button>
+      <a id="open" class="btn-ghost" href="#" target="_blank">Ver público</a>
+    </div>
+    <div id="msg" class="sub" style="margin-top:10px"></div>
+  </div>
+
+  <h2 style="margin-top:24px">Eventos cargados</h2>
+  <table class="table" id="tbl">
+    <thead><tr><th>Slug</th><th>Título</th><th>Fecha</th><th>Categoría</th><th>Acciones</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const app = initializeApp(window.FB_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const who = document.getElementById('who');
+const uidEl = document.getElementById('uid');
+uidEl.textContent = window.ADMIN_UID || '(definir en config.js)';
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ location.href='/admin/login.html'; return; }
+  who.textContent = user.email + ' (' + user.uid + ')';
+  if(user.uid !== window.ADMIN_UID){
+    who.classList.add('err');
+    who.textContent += ' · sin permisos de edición';
+    // Bloquear UI
+    document.querySelectorAll('input,select,textarea,button').forEach(el=> el.disabled = true);
+  } else {
+    loadList();
+  }
+});
+
+document.getElementById('logout').onclick = (e)=>{ e.preventDefault(); signOut(auth); };
+
+function sectorRow(s={name:'General', price:0, mp_link:''}){
+  const wrap = document.createElement('div');
+  wrap.style.marginBottom='8px';
+  wrap.innerHTML = `
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr auto;gap:8px">
+      <input placeholder="Nombre" value="${s.name||''}">
+      <input type="number" placeholder="Precio ARS" value="${s.price||0}">
+      <input placeholder="Link MP https://mpago.la/..." value="${s.mp_link||''}">
+      <button class="btn-ghost">x</button>
+    </div>
+  `;
+  wrap.querySelector('button').onclick = ()=> wrap.remove();
+  return wrap;
+}
+
+const sectors = document.getElementById('sectors');
+document.getElementById('addSector').onclick = ()=> sectors.appendChild(sectorRow());
+
+async function loadList(){
+  const snap = await getDocs(collection(db,'events'));
+  const tbody = document.querySelector('#tbl tbody');
+  tbody.innerHTML='';
+  snap.forEach(d=>{
+    const e = d.data();
+    const tr = document.createElement('tr');
+    const dt = e.date?.seconds ? new Date(e.date.seconds*1000) : (e.date ? new Date(e.date) : null);
+    const dateStr = dt ? dt.toLocaleDateString('es-AR') : '-';
+    tr.innerHTML = `<td>${d.id}</td><td>${e.title||''}</td><td>${dateStr}</td><td>${e.category||''}</td><td><a href="#" data-slug="${d.id}">Editar</a></td>`;
+    tr.querySelector('a').onclick = (ev)=>{ ev.preventDefault(); loadOne(d.id); };
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadOne(slug){
+  const ref = doc(db,'events', slug);
+  const s = await getDoc(ref);
+  if(!s.exists()) return;
+  const e = s.data();
+  document.getElementById('slug').value = slug;
+  document.getElementById('title').value = e.title||'';
+  try{ document.getElementById('date').value = new Date(e.date.seconds? e.date.seconds*1000 : e.date).toISOString().slice(0,10);}catch{}
+  document.getElementById('city').value = e.city||'';
+  document.getElementById('venue').value = e.venue||'';
+  document.getElementById('category').value = e.category||'fiestas';
+  document.getElementById('thumb').value = e.thumb||'';
+  document.getElementById('desc').value = e.desc||'';
+  sectors.innerHTML='';
+  (e.sectors||[]).forEach(s=> sectors.appendChild(sectorRow(s)));
+  document.getElementById('open').href = '/' + slug + '.html';
+}
+
+document.getElementById('save').onclick = async ()=>{
+  const msg = document.getElementById('msg');
+  msg.textContent = 'Guardando...';
+  const slug = document.getElementById('slug').value.trim();
+  if(!slug){ msg.textContent='Slug es obligatorio'; return; }
+  const e = {
+    slug,
+    title: document.getElementById('title').value.trim(),
+    date: Timestamp.fromDate(new Date(document.getElementById('date').value)),
+    city: document.getElementById('city').value.trim(),
+    venue: document.getElementById('venue').value.trim(),
+    category: document.getElementById('category').value,
+    thumb: document.getElementById('thumb').value.trim(),
+    desc: document.getElementById('desc').value.trim(),
+    sectors: Array.from(sectors.querySelectorAll('.grid')).map(row=>{
+      const [name, price, mp] = row.querySelectorAll('input');
+      return { name: name.value.trim(), price: Number(price.value||0), mp_link: mp.value.trim() };
+    })
+  };
+  try{
+    if(auth.currentUser?.uid !== window.ADMIN_UID) throw new Error('Sin permisos');
+    await setDoc(doc(db,'events', slug), e, { merge:true });
+    // Generar archivo estático SEO-friendly para este evento (opcional en hosts con escritura; si no, se usa /evento.html?id=slug)
+    msg.innerHTML = '<span class="ok">Guardado.</span> Abrí la URL pública con el botón "Ver público" o /evento.html?id='+slug;
+    await loadList();
+  }catch(err){
+    msg.innerHTML = '<span class="err">Error: '+(err.message||err)+'</span>';
+  }
+};
+
+document.getElementById('del').onclick = async ()=>{
+  const slug = document.getElementById('slug').value.trim();
+  if(!slug) return;
+  if(!confirm('¿Eliminar '+slug+'?')) return;
+  try{
+    if(auth.currentUser?.uid !== window.ADMIN_UID) throw new Error('Sin permisos');
+    await deleteDoc(doc(db,'events', slug));
+    document.getElementById('msg').innerHTML = '<span class="ok">Eliminado.</span>';
+    await loadList();
+  }catch(err){
+    document.getElementById('msg').innerHTML = '<span class="err">Error: '+(err.message||err)+'</span>';
+  }
+};
+</script>
+</body></html>
