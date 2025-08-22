@@ -1,5 +1,4 @@
-// === Pegar tu configuración de Firebase entre las líneas START/END ===
-// START
+// config.js (SIN <script> tags)
 window.FB_CONFIG = {
   apiKey: "AIzaSyCDWrSpDwAW3xvlVhv7eIbkGaJA8khSx_M",
   authDomain: "entradanc3-b2003.firebaseapp.com",
@@ -8,7 +7,7 @@ window.FB_CONFIG = {
   messagingSenderId: "195691666679",
   appId: "1:195691666679:web:968632bb77705e861ec7f2",
   measurementId: "G-777HCN2FPH"
-  window.ADMIN_UID = Ov2vTmzXY4ZNcMxqOVOccDp3Hfp2;
 };
 
-// END
+window.ADMIN_UID = "Ov2vTmzXY4ZNcMxqOVOccDp3Hfp2";
+
