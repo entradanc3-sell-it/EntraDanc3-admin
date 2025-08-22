@@ -4,7 +4,7 @@
 <title>Admin | Login</title>
 <link rel="stylesheet" href="styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="config.js"></script>
+<script src="config.js?v=2"></script>
 </head><body>
 <div class="container" style="max-width:460px">
   <h1>EntraDanc3 · Admin</h1>
@@ -38,7 +38,7 @@ $('loginBtn').onclick = async () => {
     const email = $('email').value.trim();
     const pass  = $('pass').value.trim();
     await signInWithEmailAndPassword(auth, email, pass);
-    location.href = 'dashboard.html'; // relativo para GitHub Pages
+   location.href = 'dashboard.html'; // relativo para GitHub Pages
   } catch (e) {
     console.error(e);
     msg.textContent = (e.code || e.message || e).toString();
