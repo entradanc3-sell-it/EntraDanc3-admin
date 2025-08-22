@@ -28,11 +28,11 @@ document.getElementById('loginBtn').onclick = async () => {
   msg.textContent = 'Ingresando...';
   try{
     const res = await signInWithEmailAndPassword(auth, email, pass);
-    location.href = '/admin/dashboard.html';
+   location.href=dashboard.html;
   }catch(e){
     msg.textContent = 'Error: ' + (e.message||e);
   }
 };
-onAuthStateChanged(auth, (u)=>{ if(u && u.uid===window.ADMIN_UID){ location.href='/admin/dashboard.html'; } });
+onAuthStateChanged(auth, (u)=>{ if(u && u.uid===window.ADMIN_UID){ location.href=dashboard.html;; } });
 </script>
 </body></html>
