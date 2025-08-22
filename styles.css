@@ -1,11 +1,19 @@
+:root { --red:#a20505; --bg:#0b0b0b; --card:#171717; --text:#eaeaea; --muted:#9a9a9a; }
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text)}
+.container{max-width:1100px;margin:40px auto;padding:0 16px}
+h1{font-size:38px;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 24px}
+.card{background:var(--card);border-radius:14px;padding:18px;border:1px solid #222}
+label{display:block;font-weight:600;margin:12px 0 6px}
+input,select,textarea{width:100%;background:#121212;border:1px solid #2a2a2a;color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
+textarea{min-height:120px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.btn{display:inline-block;background:var(--red);border:none;color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+.btn.secondary{background:#262626}
+table{width:100%;border-collapse:collapse;margin-top:18px}
+th,td{padding:10px;border-bottom:1px solid #262626;text-align:left}
+a{color:#fff}
 
-:root{
-  --primary:#a20505; /* rojo EntraDanc3 */
-  --bg:#0b0b0b; --elev:#121212; --text:#f5f5f5; --muted:#bdbdbd; --stroke:#242424;
-  --glass:rgba(255,255,255,.06); --radius:16px; --maxw:1120px;
-}
-*{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
-a{color:inherit;text-decoration:none}
 .container{max-width:var(--maxw);margin:auto;padding:24px}
 .header{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-bottom:1px solid var(--stroke)}
 .nav{display:flex;gap:14px;align-items:center}
