@@ -26,7 +26,12 @@ if (!window.FB_CONFIG) {
   alert('No se cargó config.js. Subí config.js a la raíz del admin y revisá <script src="config.js">');
 }
 
-const app = initializeApp(firebaseConfig);
+if (!window.FB_CONFIG) {
+  alert("No se cargó config.js");
+  throw new Error("config faltante");
+}
+const app = initializeApp(window.FB_CONFIG);
+
   const auth = getAuth(app);
 
 const $ = (id)=>document.getElementById(id);
