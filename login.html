@@ -18,14 +18,15 @@
 </div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
 
 if (!window.FB_CONFIG) {
   alert('No se cargó config.js. Subí config.js a la raíz del admin y revisá <script src="config.js">');
 }
 
-const app = initializeApp(window.FB_CONFIG);
-const auth = getAuth(app);
+  const app  = initializeApp(window.FB_CONFIG);
+  const auth = getAuth(app);
 
 const $ = (id)=>document.getElementById(id);
 const msg = document.createElement('div'); msg.id='msg'; msg.style.marginTop='10px';
